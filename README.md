@@ -32,7 +32,7 @@ again.
 Install the appropriate [SourceBans++](https://github.com/sbpp/sourcebans-pp/) plugins working for your type of gameserver.
 
 ## Versioning
-I use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/crinis/hlxce-docker/tags). 
+I use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/crinis/sourcebans-docker/tags). 
 
 ## License
 This project is licensed under the GPLv3 License - see the [LICENSE.md](LICENSE.md) file for details
