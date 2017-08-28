@@ -11,7 +11,7 @@ services:
       DB_PASSWORD: sbpp
       DB_NAME: sbpp
       # Set this to something else to delete the install/ folder
-      INSTALL: 'false'
+      INSTALL: 'true'
     links:
     - db:db
     ports: 
