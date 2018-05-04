@@ -1,6 +1,6 @@
 FROM php:7.1-apache
 
-ENV SBPP_VERSION=1.6.2 \
+ENV SBPP_VERSION=1.6.3 \
     INSTALL=true
 
 COPY docker-sbpp-entrypoint /usr/local/bin/
