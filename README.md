@@ -13,7 +13,7 @@ You need a working installation of Docker and Docker compose to follow the insta
 [Install Docker Compose](https://docs.docker.com/compose/install/)
 
 ### Installing
-For a basic setup use my pre-configured [docker-compose.yml](docker-compose.yml). Make sure to change all passwords before running this in production.
+For a basic setup use my pre-configured [docker-compose.yml](https://github.com/crinis/sourcebans-docker/blob/master/docker-compose.yml). Make sure to change all passwords before running this in production.
 
 Run the following command in the same folder as the docker-compose.yml file to get the containers running.
 ```
