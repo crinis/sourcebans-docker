@@ -4,7 +4,7 @@ volumes:
   mysql:
 services:
   web:
-    image: sbpp
+    image: crinis/sourcebans
     environment:
       DB_HOST: db
       DB_USERNAME: sbpp
