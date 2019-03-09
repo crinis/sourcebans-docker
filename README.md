@@ -1,6 +1,6 @@
-# Sourcebans Docker iamge
+# Sourcebans Docker Image
 
-Docker Images for SourceBans++
+Docker Images for [SourceBans++](https://github.com/sbpp/sourcebans-pp/)
 
 ## Project state
 
