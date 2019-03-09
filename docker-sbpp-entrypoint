@@ -1,8 +1,0 @@
-#!/bin/bash
-
-if [ "true" != "$INSTALL" ]
-then
-    rm -R install/ updater/
-fi
-
-exec "docker-php-entrypoint" $@

@@ -1,26 +1,34 @@
 FROM php:7.1-apache
 
-ENV SBPP_VERSION=1.6.3 \
-    INSTALL=true
+ENV SOURCEBANS_VERSION=1.6.3 \
+    REMOVE_SETUP_DIRS=false
 
-COPY docker-sbpp-entrypoint /usr/local/bin/
-COPY sbpp.ini /usr/local/etc/php/conf.d/
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        wget \
+    && \
+    rm -rf /var/lib/apt/lists/*
 
-WORKDIR /var/www/html/
+RUN mkdir /usr/src/sourcebans-${SOURCEBANS_VERSION}/ && \
+    wget -qO- https://github.com/sbpp/sourcebans-pp/releases/download/${SOURCEBANS_VERSION}/sourcebans-pp-${SOURCEBANS_VERSION}.webpanel-only.tar.gz | tar xvz -C /usr/src/sourcebans-${SOURCEBANS_VERSION}/ && \
+    mkdir /docker/
 
-RUN set -xe; \
-        runDeps=' \
-            mysql-client \
-        '; \
-        apt-get update && apt-get install -y $runDeps \
-	        --no-install-recommends && rm -r /var/lib/apt/lists/* \
-        && docker-php-ext-install mysqli pdo_mysql \
-        && chmod +x /usr/local/bin/docker-sbpp-entrypoint \
-        && curl -L https://github.com/sbpp/sourcebans-pp/releases/download/${SBPP_VERSION}/sourcebans-pp-${SBPP_VERSION}.webpanel-only.tar.gz -o sb.tar.gz \
-        && tar -zxvf sb.tar.gz \
-        && rm -rf sb.tar.gz \
-        && chown -R www-data:www-data .
+RUN savedAptMark="$(apt-mark showmanual)" && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libgmp-dev \
+    && \
+    rm -rf /var/lib/apt/lists/* && \
+    docker-php-ext-configure gmp && \
+    docker-php-ext-install gmp mysqli pdo_mysql && \
+    apt-mark auto '.*' > /dev/null && \
+    apt-mark manual $savedAptMark && \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 
-ENTRYPOINT ["docker-sbpp-entrypoint"]
+COPY docker-sourcebans-entrypoint.sh /docker/docker-sourcebans-entrypoint.sh
+COPY sourcebans.ini /usr/local/etc/php/conf.d/sourcebans.ini
 
+RUN chmod +x /docker/docker-sourcebans-entrypoint.sh
+
+ENTRYPOINT ["/docker/docker-sourcebans-entrypoint.sh"]
 CMD ["apache2-foreground"]

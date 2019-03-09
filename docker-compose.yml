@@ -1,42 +1,32 @@
-version: '2'
-volumes:
-  html:
-  mysql:
+version: '3'
 services:
   web:
-    image: crinis/sourcebans
+    image: crinis/sourcebans:latest
     environment:
-      DB_HOST: db
-      DB_USERNAME: sbpp
-      DB_PASSWORD: sbpp
-      DB_NAME: sbpp
-      # Set this to something else to delete the install/ folder
-      INSTALL: 'true'
-    links:
-    - db:db
+      # Set this to 'true' to automatically delete the install/ and updater/ directories during start
+      REMOVE_SETUP_DIRS: 'false'
+    networks:
+      - db
     ports: 
     - 80:80
     volumes:
-      # persist /var/www/html/. This means manual upgrading next time.
-    - html:/var/www/html/
+      - sourcebans:/var/www/html/
+
   db:
     image: mariadb:5
     environment:
-      MYSQL_USER: sbpp
-      MYSQL_PASSWORD: sbpp
-      MYSQL_DATABASE: sbpp
-      MYSQL_ROOT_PASSWORD: sbpp
+      MYSQL_USER: sourcebans
+      MYSQL_PASSWORD: ThisShouldBeAStrongPassword
+      MYSQL_DATABASE: sourcebans
+      MYSQL_ROOT_PASSWORD: ThisShouldBeAStrongPassword
     volumes:
-    # This is important as it persists your database, if you don't do that all data will be lost when a containers gets destroyed
-    - mysql:/var/lib/mysql
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    environment:
-      PMA_HOST: db
-      PMA_PORT: '3306'
-    links:
-    - db:db
-    ports:
-    # Change this port if you don't want phpMyAdmin running on port 8080
-    - 8080:80
-    cpu_shares: 128
+      - mysql:/var/lib/mysql
+    networks:
+      - db
+
+networks:
+  db:
+
+volumes:
+  sourcebans: 
+  mysql:

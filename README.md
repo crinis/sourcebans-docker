@@ -1,38 +1,89 @@
-# SourceBans++
+# Sourcebans Docker iamge
 
-A [Docker image](https://hub.docker.com/r/crinis/sourcebans/) for running SourceBans++ in a Docker container.
+Docker Images for SourceBans++
+
+## Project state
+
+The Docker images in this project are not yet production ready and might be modified without backwards compatibility at any time. Make sure to set your deployment image to use specific version tags.
 
 ## Getting Started
-These instructions will help you to get a containerized installation of SourceBans++ running. This includes a web interface and a database with phpMyAdmin. I recommend to use fixed tags of my Docker images as the latest tag is subject to change.
 
-### Prerequisites
-You need a working installation of Docker and Docker compose to follow the installation instructions.
+These instructions will cover usage information for the docker container 
 
-[Install Docker](https://docs.docker.com/engine/installation/)
+### Prerequisities
 
-[Install Docker Compose](https://docs.docker.com/compose/install/)
+In order to run this container you'll need docker installed.
 
-### Installing
-For a basic setup use my pre-configured [docker-compose.yml](https://github.com/crinis/sourcebans-docker/blob/master/docker-compose.yml). Make sure to change all passwords before running this in production.
+* [Windows](https://docs.docker.com/windows/started)
+* [OS X](https://docs.docker.com/mac/started/)
+* [Linux](https://docs.docker.com/linux/started/)
 
-Run the following command in the same folder as the docker-compose.yml file to get the containers running.
+### Usage
+
+#### Quickstart
+
+If you use [Docker Compose](https://docs.docker.com/compose/) there is an example [docker-compose.yml](docker-compose.yml) file you can use for fast setup.
+
+Create a Docker network
+```shell
+docker network create sourcebans-db
 ```
-docker-compose up
-```
-Now you should have your SourceBans++ web interface running at port 80 and an instance of phpMyAdmin at port 8080.
 
-Visit the SourceBans++ web interface at yourdomain.tld/install/ and follow the installation instructions.
+Start a MariaDB container
 
-After you have finished the installation process set the environment variable "INSTALL" of the "web" service to false. This will automatically delete the install/ and updater/ folders the next time you start the containers. Now run
+```shell
+docker run -d --volume sourcebans-mysql:/var/lib/mysql/ --network sourcebans-db \
+    --env MYSQL_DATABASE=sourcebans --env MYSQL_USER=sourcebans --env MYSQL_PASSWORD=ThisShouldBeAStrongPassword --env MYSQL_ROOT_PASSWORD=ThisShouldBeAStrongPassword \
+    --name sourcebans-mariadb mariadb:5
 ```
-docker-compose up
-```
-again.
 
-Install the appropriate [SourceBans++](https://github.com/sbpp/sourcebans-pp/) plugins working for your type of gameserver.
+Start the Sourcebans container that is based on the official PHP Docker Image.
+
+```shell
+docker run -d -p 80:80 --volume sourcebans:/var/www/html/ --network sourcebans-db --name sourcebans crinis/sourcebans:latest
+```
+
+Connect to your Docker host on port 80 and go through the setup process at yourhost/install in your browser using your specified credentials for the MySQL container and `sourcebans-mariadb` if not otherwise specified as the database host.
+
+After completing the installation steps you first need to stop the sourcebans container...
+
+```shell
+docker rm -f sourcebans
+```
+... and restart while setting the `REMOVE_SETUP_DIRS` environment variable to "true". This will remove your install/ and updater/ directories.
+
+```shell
+docker run -d -p 80:80 --volume sourcebans:/var/www/html/ --network sourcebans-db --env REMOVE_SETUP_DIRS=true --name sourcebans crinis/sourcebans:latest
+```
+
+Now visit Sourcebans in your browser.
+
+#### Environment Variables
+
+* `REMOVE_SETUP_DIRS` - Removes the install/ and updater/ directories. You have to use this after installing or updating your installation
+
+#### Volumes
+
+* `/var/www/html/` - Contains the Sourcebans installation
+
+#### Useful File Locations
+
+* `/usr/local/etc/php/conf.d/sourcebans.ini` - The Sourcebans specific PHP configuration that overrides defaults
+
+#### Docker Image Tags
+
+I recommend to use the Docker image tags starting with the Git tags of this repository as images containing older Sourcebans Versions might be changed and not be compatible. A tag used in production should look like this: `0.3.0-sourcebans1.6.3`.
+
+* `0.3.0-sourcebans1.6.3, 1.6.3, latest`
 
 ## Versioning
-I use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/crinis/sourcebans-docker/tags). 
+
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/crinis/sourcebans-docker/tags). 
+
+## Authors
+
+* *Felix Spittel* - *Initial work* - [Crinis](https://github.com/crinis)
 
 ## License
-This project is licensed under the GPLv3 License - see the [LICENSE.md](LICENSE.md) file for details
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details. The image contains software that use different licenses.
