@@ -60,7 +60,7 @@ Now visit Sourcebans in your browser.
 
 #### Environment Variables
 
-* `REMOVE_SETUP_DIRS` - Removes the install/ and updater/ directories. You have to use this after installing or updating your installation
+* `REMOVE_SETUP_DIRS` - Removes the install/ and updater/ directories. You have to set this to "true" after installing or updating your installation
 
 #### Volumes
 
@@ -69,6 +69,9 @@ Now visit Sourcebans in your browser.
 #### Useful File Locations
 
 * `/usr/local/etc/php/conf.d/sourcebans.ini` - The Sourcebans specific PHP configuration that overrides defaults
+
+#### Limitations
+This image does not support automatic updates of SourceBans++ yet, even if you update to a newer version of this image. To update you should follow the normal [update instructions](https://sbpp.github.io/docs/updating/) inside the container.
 
 #### Docker Image Tags
 
