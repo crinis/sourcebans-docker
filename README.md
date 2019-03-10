@@ -1,6 +1,6 @@
 # Sourcebans Docker Image
 
-Docker Images for [SourceBans++](https://github.com/sbpp/sourcebans-pp/)
+[Docker Image](https://hub.docker.com/r/crinis/sourcebans) for [SourceBans++](https://github.com/sbpp/sourcebans-pp/)
 
 ## Project state
 
@@ -75,13 +75,13 @@ This image does not support automatic updates of SourceBans++ yet, even if you u
 
 #### Docker Image Tags
 
-I recommend to use the Docker image tags starting with the Git tags of this repository as images containing older Sourcebans Versions might be changed and not be compatible. A tag used in production should look like this: `0.3.0-sourcebans1.6.3`.
+I recommend to use the [Docker image tags](https://cloud.docker.com/repository/docker/crinis/sourcebans/tags) starting with the [Git tags](https://github.com/crinis/sourcebans-docker/tags) of this repository as images containing older Sourcebans Versions might be changed and not be compatible. A tag used in production should look like this: `0.3.0-sourcebans1.6.3`.
 
 * `0.3.0-sourcebans1.6.3, 1.6.3, latest`
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/crinis/sourcebans-docker/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/crinis/sourcebans-docker/tags).
 
 ## Authors
 
