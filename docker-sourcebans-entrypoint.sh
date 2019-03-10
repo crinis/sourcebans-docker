@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 #
-# Performs certain startup tasks including installing TYPO3 source, setting up the TYPO3 database, copying important files, changing LocalConfiguration.php settings
+# Performs setup tasks on container start
 
 set -euo pipefail
 
+# Copy Sourcebans sourcecode to docroot if empty
 if [ -z "$(ls -A /var/www/html/)" ]; then
     cp -R /usr/src/sourcebans-${SOURCEBANS_VERSION}/* /var/www/html/
 fi
 
+# If $REMOVE_SETUP_DIRS is set remove the install and updater directories if they exist
 if [ "true" == "$REMOVE_SETUP_DIRS" ] || ( [ ! -z ${INSTALL+x} ] && ["true" != "$INSTALL"] ); then
     if [ -d /var/www/html/install/ ]; then
         rm -R /var/www/html/install/
@@ -17,6 +19,7 @@ if [ "true" == "$REMOVE_SETUP_DIRS" ] || ( [ ! -z ${INSTALL+x} ] && ["true" != "
     fi
 fi
 
+# Set directory owner for docroot recursively
 chown -R www-data:www-data /var/www/html/
 
 exec "docker-php-entrypoint" $@
