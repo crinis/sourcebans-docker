@@ -75,9 +75,7 @@ This image does not support automatic updates of SourceBans++ yet, even if you u
 
 #### Docker Image Tags
 
-I recommend to use the [Docker image tags](https://cloud.docker.com/repository/docker/crinis/sourcebans/tags) starting with the [Git tags](https://github.com/crinis/sourcebans-docker/tags) of this repository as images containing older Sourcebans Versions might be changed and not be compatible. A tag used in production should look like this: `0.3.0-sourcebans1.6.3`.
-
-* `0.3.0-sourcebans1.6.3, 1.6.3, latest`
+I recommend to use the [Docker image tags](https://cloud.docker.com/repository/docker/crinis/sourcebans/tags) starting with the [Git tags](https://github.com/crinis/sourcebans-docker/tags) of this repository as images containing older Sourcebans Versions might be changed and not be compatible.
 
 ## Versioning
 

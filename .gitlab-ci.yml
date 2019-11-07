@@ -1,0 +1,36 @@
+image: docker:19.03.1
+
+services:
+  - docker:19.03.1-dind
+
+variables:
+  IMAGE_REPOSITORY: crinis/sourcebans
+
+before_script:
+  - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+
+build:on-schedule:
+  only:
+    - schedules
+  script:
+    - for git_tag in $(git tag) 
+      do
+          git checkout tags/$git_tag
+          docker build -t $IMAGE_REPOSITORY:$git_tag .
+          docker push $IMAGE_REPOSITORY:$git_tag
+      done
+
+build:on-tags:
+  only:
+    - tags
+  script:
+    - docker build -t $IMAGE_REPOSITORY:$CI_COMMIT_TAG .
+    - docker push $IMAGE_REPOSITORY:$CI_COMMIT_TAG
+
+build:
+  script:
+    - docker build -t $IMAGE_REPOSITORY:latest .
+    - docker push $IMAGE_REPOSITORY:latest
+
+after_script:
+  - docker logout
