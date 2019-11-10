@@ -12,9 +12,8 @@ before_script:
 build:on-schedule:
   only:
     - schedules
-  before_script:
-    - apk update && apk add git
   script:
+    - apk update && apk add git
     - > 
       for git_tag in $(git tag); do
         git checkout tags/$git_tag
