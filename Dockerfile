@@ -20,7 +20,7 @@ RUN savedAptMark="$(apt-mark showmanual)" && \
     && \
     rm -rf /var/lib/apt/lists/* && \
     docker-php-ext-configure gmp && \
-    docker-php-ext-install gmp mysqli pdo_mysql && \
+    docker-php-ext-install gmp mysqli pdo_mysql bcmath && \
     apt-mark auto '.*' > /dev/null && \
     apt-mark manual $savedAptMark && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
