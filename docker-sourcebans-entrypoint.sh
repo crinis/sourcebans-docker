@@ -10,7 +10,7 @@ if [ -z "$(ls -A /var/www/html/)" ]; then
 fi
 
 # If $REMOVE_SETUP_DIRS is set remove the install and updater directories if they exist
-if [ "true" == "$REMOVE_SETUP_DIRS" ] || ( [ ! -z ${INSTALL+x} ] && ["true" != "$INSTALL"] ); then
+if [ "true" == "$REMOVE_SETUP_DIRS" ]; then
     if [ -d /var/www/html/install/ ]; then
         rm -R /var/www/html/install/
     fi
