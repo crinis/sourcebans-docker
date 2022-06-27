@@ -4,7 +4,7 @@
 
 ## Project state
 
-The Docker images in this project are not yet production ready and might be modified without backwards compatibility at any time. Make sure to set your deployment image to use specific version tags.
+This project is deprecated as the underlying SourceBans++ version and base image are heavily outdated.
 
 ## Getting Started
 
