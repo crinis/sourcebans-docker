@@ -4,8 +4,8 @@
 
 set -euo pipefail
 
-# Copy Sourcebans sourcecode to docroot if empty
-if [ -z "$(ls -A /var/www/html/)" ]; then
+# Copy Sourcebans sourcecode to docroot
+if [ "true" == "$UPDATE_SRC" ] || [ -z "$(ls -A /var/www/html/)" ]; then
     cp -R /usr/src/sourcebans-${SOURCEBANS_VERSION}/* /var/www/html/
 fi
 

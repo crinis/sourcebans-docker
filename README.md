@@ -58,6 +58,11 @@ docker run -d -p 80:80 --volume sourcebans:/var/www/html/ --network sourcebans-d
 
 Now visit Sourcebans in your browser.
 
+#### Using Image Tags
+
+Make sure to use version tagged images (e.g. `crinis/sourcebans:1.0.0`) as the `latest` tag might be changed without backwards compatibility.
+[Available tags](https://github.com/crinis/sourcebans-docker/tags) 
+
 #### Environment Variables
 
 * `REMOVE_SETUP_DIRS` - Removes the install/ and updater/ directories. You have to set this to "true" after installing or updating your installation
@@ -70,12 +75,9 @@ Now visit Sourcebans in your browser.
 
 * `/usr/local/etc/php/conf.d/sourcebans.ini` - The Sourcebans specific PHP configuration that overrides defaults
 
-#### Limitations
-This image does not support automatic updates of SourceBans++ yet, even if you update to a newer version of this image. To update you should follow the normal [update instructions](https://sbpp.github.io/docs/updating/) inside the container.
+#### Updating
 
-#### Docker Image Tags
-
-I recommend to use the [Docker image tags](https://cloud.docker.com/repository/docker/crinis/sourcebans/tags) starting with the [Git tags](https://github.com/crinis/sourcebans-docker/tags) of this repository as images containing older Sourcebans Versions might be changed and not be compatible.
+You can either update the SourceBans sources manually as described [here](https://sbpp.dev/docs/updating/) or set the `UPDATE_SRC` environment variable to `true` which will update to the latest SourceBans++ version included in the release. This might override manual changes.
 
 ## Versioning
 

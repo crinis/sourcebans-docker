@@ -1,7 +1,8 @@
 FROM php:7.4-apache
 
-ENV SOURCEBANS_VERSION=1.6.3 \
-    REMOVE_SETUP_DIRS=false
+ENV SOURCEBANS_VERSION=1.6.4 \
+    REMOVE_SETUP_DIRS=false \
+    UPDATE_SRC=false
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \

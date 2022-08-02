@@ -5,6 +5,8 @@ services:
     environment:
       # Set this to 'true' to automatically delete the install/ and updater/ directories during start
       REMOVE_SETUP_DIRS: 'false'
+      # Set this to 'false' if you made modifications to SourceBans++ source code
+      UPDATE_SRC: 'true'
     networks:
       - db
     ports: 
