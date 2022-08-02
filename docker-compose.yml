@@ -13,7 +13,7 @@ services:
       - sourcebans:/var/www/html/
 
   db:
-    image: mariadb:5
+    image: mariadb:10
     environment:
       MYSQL_USER: sourcebans
       MYSQL_PASSWORD: ThisShouldBeAStrongPassword
