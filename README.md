@@ -2,10 +2,6 @@
 
 [Docker Image](https://hub.docker.com/r/crinis/sourcebans) for [SourceBans++](https://github.com/sbpp/sourcebans-pp/)
 
-## Project state
-
-This project is deprecated as the underlying SourceBans++ version and base image are heavily outdated.
-
 ## Getting Started
 
 These instructions will cover usage information for the docker container 
