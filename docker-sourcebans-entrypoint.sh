@@ -6,7 +6,11 @@ set -euo pipefail
 
 # Copy Sourcebans sourcecode to docroot
 if [ "true" == "$UPDATE_SRC" ] || [ -z "$(ls -A /var/www/html/)" ]; then
+    rm -rf /var/www/html/themes/default /var/www/html/updater /var/www/html/install /var/www/html/pages /var/www/html/includes
     cp -R /usr/src/sourcebans-${SOURCEBANS_VERSION}/* /var/www/html/
+
+    sed -i '/ini_set('display_errors', 1);/d' /var/www/html/install/init.php
+    sed -i '/error_reporting(E_ALL);/d' /var/www/html/install/init.php
 fi
 
 # If $REMOVE_SETUP_DIRS is set remove the install and updater directories if they exist

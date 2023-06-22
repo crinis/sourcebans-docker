@@ -73,6 +73,8 @@ Make sure to use version tagged images (e.g. `crinis/sourcebans:1.0.0`) as the `
 
 #### Updating
 
+**Always create a full backup of your installation before updating.**
+
 You can either update the SourceBans sources manually as described [here](https://sbpp.dev/docs/updating/) or set the `UPDATE_SRC` environment variable to `true` which will update to the latest SourceBans++ version included in the release. This might override manual changes.
 
 ## Versioning
@@ -81,7 +83,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* *Felix Spittel* - *Initial work* - [Crinis](https://github.com/crinis)
+* *Initial work* - [Crinis](https://github.com/crinis)
 
 ## License
 
