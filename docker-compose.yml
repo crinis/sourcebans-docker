@@ -1,19 +1,22 @@
 version: '3'
 services:
   web:
-    image: crinis/sourcebans:latest
+    image: crinis/sourcebans:dev
     environment:
-      # Set this to 'true' to automatically delete the install/ and updater/ directories during start
-      REMOVE_SETUP_DIRS: 'false'
-      # Set this to 'false' if you made modifications to SourceBans++ source code
-      UPDATE_SRC: 'true'
+      # Enable on install or update and make sure to set this to 'false' afterwards
+      # Also set this to false if you made any manual changes to Sourcebans sourcecode you want to keep
+      INSTALL: 'true'
     networks:
       - db
     ports: 
-    - 8080:80
+    # Change the port before the colon to whatever you want to use
+    - 80:8080
     volumes:
       - sourcebans:/var/www/html/
-
+    # You can enable the following three lines to run the container as a different user. For example when using podman.
+    #  - sourcebans:/var/www/html/:z
+    # user: ${DOCKER_UID:-1000}:${DOCKER_GID:-1000}
+    # userns_mode: "keep-id"
   db:
     image: mariadb:10
     environment:

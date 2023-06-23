@@ -1,18 +1,14 @@
-FROM php:8.2-apache
+FROM composer:2.5.8 AS composer
+ARG CHECKOUT=php81
 
-ENV SOURCEBANS_VERSION=1.7.0 \
-    REMOVE_SETUP_DIRS=false \
-    UPDATE_SRC=false
+RUN git clone https://github.com/sbpp/sourcebans-pp.git && \
+    git -C sourcebans-pp checkout ${CHECKOUT} && \
+    composer install --no-dev --no-interaction --no-progress --no-suggest --optimize-autoloader --working-dir=sourcebans-pp/web/
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        wget \
-    && \
-    rm -rf /var/lib/apt/lists/*
+# Build the actual image
+FROM php:8.1-apache
 
-RUN mkdir /usr/src/sourcebans-${SOURCEBANS_VERSION}/ && \
-    wget -qO- https://github.com/sbpp/sourcebans-pp/releases/download/${SOURCEBANS_VERSION}/sourcebans-pp-${SOURCEBANS_VERSION}.webpanel-only.tar.gz | tar xvz --strip-components=1 -C /usr/src/sourcebans-${SOURCEBANS_VERSION}/ && \
-    mkdir /docker/
+ENV INSTALL=false
 
 RUN savedAptMark="$(apt-mark showmanual)" && \
     apt-get update && \
@@ -26,8 +22,13 @@ RUN savedAptMark="$(apt-mark showmanual)" && \
     apt-mark manual $savedAptMark && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 
+RUN mkdir /docker/ && \
+    mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini && \
+    sed -i 's/Listen 80/Listen 8080/g' /etc/apache2/ports.conf && \
+    sed -i 's/80/8080/g' /etc/apache2/sites-enabled/000-default.conf
+
+COPY --from=composer /app/sourcebans-pp/web /usr/src/sourcebans
 COPY docker-sourcebans-entrypoint.sh /docker/docker-sourcebans-entrypoint.sh
-COPY /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 COPY sourcebans.ini /usr/local/etc/php/conf.d/sourcebans.ini
 
 RUN chmod +x /docker/docker-sourcebans-entrypoint.sh

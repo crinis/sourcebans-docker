@@ -1,12 +1,8 @@
 # Sourcebans Docker Image
 
-[Docker Image](https://hub.docker.com/r/crinis/sourcebans) for [SourceBans++](https://github.com/sbpp/sourcebans-pp/)
+[Docker Image](https://hub.docker.com/r/crinis/sourcebans) for [SourceBans++](https://github.com/sbpp/sourcebans-pp/).
 
-## Getting Started
-
-These instructions will cover usage information for the docker container 
-
-### Prerequisities
+## Prerequisities
 
 In order to run this container you'll need docker installed.
 
@@ -14,72 +10,52 @@ In order to run this container you'll need docker installed.
 * [OS X](https://docs.docker.com/mac/started/)
 * [Linux](https://docs.docker.com/linux/started/)
 
-### Usage
+## Usage
 
-#### Quickstart
+### Installation
 
-If you use [Docker Compose](https://docs.docker.com/compose/) there is an example [docker-compose.yml](docker-compose.yml) file you can use for fast setup.
+If you use [Docker Compose](https://docs.docker.com/compose/) there is an example [docker-compose.yml](docker-compose.yml) file you can use for fast setup. **Please pay attention to the `INSTALL` environment variable.**
 
-Create a Docker network
-```shell
-docker network create sourcebans-db
-```
+1. Change settings including passwords in docker-compose.yml
+2. Set environment variable `INSTALL` to true.
+3. Run `docker-compose up`.
+4. Visit https://example.org/install and enter your database and admin credentials.
+5. Stop using `STRG+C` or `docker-compose down`.
+6. Set environment variable `INSTALL` to false.
+7. Run `docker-compose up` and visit your new Sourcebans installation.
 
-Start a MariaDB container
+### Tags
 
-```shell
-docker run -d --volume sourcebans-mysql:/var/lib/mysql/ --network sourcebans-db \
-    --env MYSQL_DATABASE=sourcebans --env MYSQL_USER=sourcebans --env MYSQL_PASSWORD=ThisShouldBeAStrongPassword --env MYSQL_ROOT_PASSWORD=ThisShouldBeAStrongPassword \
-    --name sourcebans-mariadb mariadb:5
-```
+See all available tags [here](https://hub.docker.com/r/crinis/sourcebans/tags). The tags and releases on this Github repository are irrevelant for now.
 
-Start the Sourcebans container that is based on the official PHP Docker Image.
+### Environment Variables
 
-```shell
-docker run -d -p 80:80 --volume sourcebans:/var/www/html/ --network sourcebans-db --name sourcebans crinis/sourcebans:latest
-```
+* `INSTALL` - If set to "true" this copies Sourcebans into the `/var/www/html` directory and may override your manual changes. This should be set on first install and can be enabled for a convenient update. **Always make a full backup before setting this to 'true'!**
 
-Connect to your Docker host on port 80 and go through the setup process at yourhost/install in your browser using your specified credentials for the MySQL container and `sourcebans-mariadb` if not otherwise specified as the database host.
-
-After completing the installation steps you first need to stop the sourcebans container...
-
-```shell
-docker rm -f sourcebans
-```
-... and restart while setting the `REMOVE_SETUP_DIRS` environment variable to "true". This will remove your install/ and updater/ directories.
-
-```shell
-docker run -d -p 80:80 --volume sourcebans:/var/www/html/ --network sourcebans-db --env REMOVE_SETUP_DIRS=true --name sourcebans crinis/sourcebans:latest
-```
-
-Now visit Sourcebans in your browser.
-
-#### Using Image Tags
-
-Make sure to use version tagged images (e.g. `crinis/sourcebans:1.0.0`) as the `latest` tag might be changed without backwards compatibility.
-[Available tags](https://github.com/crinis/sourcebans-docker/tags) 
-
-#### Environment Variables
-
-* `REMOVE_SETUP_DIRS` - Removes the install/ and updater/ directories. You have to set this to "true" after installing or updating your installation
-
-#### Volumes
+### Volumes
 
 * `/var/www/html/` - Contains the Sourcebans installation
 
-#### Useful File Locations
+### Useful File Locations
 
 * `/usr/local/etc/php/conf.d/sourcebans.ini` - The Sourcebans specific PHP configuration that overrides defaults
 
-#### Updating
+### Updating
 
 **Always create a full backup of your installation before updating.**
 
-You can either update the SourceBans sources manually as described [here](https://sbpp.dev/docs/updating/) or set the `UPDATE_SRC` environment variable to `true` which will update to the latest SourceBans++ version included in the release. This might override manual changes.
+Change the Docker image tag and read below:
 
-## Versioning
+You can either update the SourceBans sources manually as described [here](https://sbpp.dev/docs/updating/) or set the `INSTALL` environment variable to `true` which will update to the latest SourceBans++ version included in the release. In case you made manual changes to any of the following directories they will be overriden.
+- /var/www/html/themes/default
+- /var/www/html/updater
+- /var/www/html/install
+- /var/www/html/pages
+- /var/www/html/includes
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/crinis/sourcebans-docker/tags).
+### Rootless
+
+The image can be used fully rootless. But up to and including Sourcebans release 1.7.0 you will not be able to login when exposing a non-standard port.
 
 ## Authors
 
