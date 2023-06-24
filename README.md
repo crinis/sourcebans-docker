@@ -29,10 +29,10 @@ If you use [Docker Compose](https://docs.docker.com/compose/) there is an exampl
 See all available image tags [here](https://hub.docker.com/r/crinis/sourcebans/tags). 
 
 There are various different types of tags you can use if you automate your deployment.
-- Tags like `:sb-1.7.0` follow the tags of the Sourcebans repository. They may be rebuild with updated packages at any time. There is a slight chance that they might break at some point.
-- The `sb-dev` tag contains the latest build directly from the Sourcebans repository.
+- Tags like `:sb-1.7.0` follow the tags of the Sourcebans repository. The image containing the latest Sourcebans release will be rebuild with updated packages regularly. There is a slight chance that they might break at some point.
+- The `sb-dev` tag contains the latest build directly from the Sourcebans repository. This can be considered very unstable.
 - Numbered tags like `:sb-5361142902` will only be build once and therefore won't break later on. They will never receive any changes.
-- The [semver](https://semver.org/) tags, e.g. `:2.0.0` follow the tags on this Github repository. They may be rebuild with updated packages at any time. But may ship outdated Sourcebans versions for a longer time.
+- The [semver](https://semver.org/) tags, e.g. `:2.0.0` follow the release tags on this Github repository. The latest release will be rebuild with updated packages regularly. But may ship outdated Sourcebans versions for a longer time.
 - `latest` points to the latest tag on this Github repository.
 
 ### Environment Variables
