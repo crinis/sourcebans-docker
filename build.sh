@@ -1,6 +1,6 @@
 #!/usr/bin/zsh
 #
-# Builds Sourcebans Docker images locally until Github Actions are set up
+# Builds Sourcebans Docker images locally
 
 set -e
 
@@ -11,9 +11,5 @@ function get_latest_release_tag() {
 
 SB_TAG=$(get_latest_release_tag)
 
-podman build -t crinis/sourcebans:${SB_TAG} -t crinis/sourcebans:latest --build-arg CHECKOUT="${SB_TAG}" .
-podman push crinis/sourcebans:${SB_TAG}
-podman push crinis/sourcebans:latest
-
-podman build -t crinis/sourcebans:dev --build-arg CHECKOUT="php81" .
-podman push crinis/sourcebans:dev
+podman build -t crinis/sourcebans:sb-${SB_TAG} -t crinis/sourcebans:latest --build-arg CHECKOUT="${SB_TAG}" .
+podman build -t crinis/sourcebans:sb-dev --build-arg CHECKOUT="php81" .

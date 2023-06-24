@@ -1,7 +1,7 @@
 version: '3'
 services:
   web:
-    image: crinis/sourcebans:dev
+    image: crinis/sourcebans:latest
     environment:
       # Enable on install or update and make sure to set this to 'false' afterwards
       # Also set this to false if you made any manual changes to Sourcebans sourcecode you want to keep

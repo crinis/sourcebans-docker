@@ -24,9 +24,16 @@ If you use [Docker Compose](https://docs.docker.com/compose/) there is an exampl
 6. Set environment variable `INSTALL` to false.
 7. Run `docker-compose up` and visit your new Sourcebans installation.
 
-### Tags
+### Image Tags
 
-See all available tags [here](https://hub.docker.com/r/crinis/sourcebans/tags). The tags and releases on this Github repository are irrevelant for now.
+See all available image tags [here](https://hub.docker.com/r/crinis/sourcebans/tags). 
+
+There are various different types of tags you can use if you automate your deployment.
+- Tags like `:sb-1.7.0` follow the tags of the Sourcebans repository. They may be rebuild with updated packages at any time. There is a slight chance that they might break at some point.
+- The `sb-dev` tag contains the latest build directly from the Sourcebans repository.
+- Numbered tags like `:sb-5361142902` will only be build once and therefore won't break later on. They will never receive any changes.
+- The [semver](https://semver.org/) tags, e.g. `:2.0.0` follow the tags on this Github repository. They may be rebuild with updated packages at any time. But may ship outdated Sourcebans versions for a longer time.
+- `latest` points to the latest tag on this Github repository.
 
 ### Environment Variables
 
