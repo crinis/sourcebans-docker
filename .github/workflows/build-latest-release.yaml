@@ -6,9 +6,6 @@ on:
   release:
     types: [created]
 
-env:
-  SOURCEBANS_VERSION: "1.7.0"
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -45,5 +42,4 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:${{ env.RELEASE_TAG }}, ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:latest, ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:${{ github.run_id }}
-          build-args: |
-            CHECKOUT=${{ env.SOURCEBANS_VERSION }}
+

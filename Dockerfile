@@ -1,5 +1,5 @@
 FROM composer:2.5.8 AS composer
-ARG CHECKOUT=php81
+ARG CHECKOUT=1.7.0
 
 RUN git clone https://github.com/sbpp/sourcebans-pp.git && \
     git -C sourcebans-pp checkout ${CHECKOUT} && \
