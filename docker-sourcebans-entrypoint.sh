@@ -8,6 +8,7 @@ set -euo pipefail
 if [ "true" == $INSTALL ]; then
     rm -rf /var/www/html/themes/default /var/www/html/updater /var/www/html/install /var/www/html/pages /var/www/html/includes
     cp -R /usr/src/sourcebans/* /var/www/html/
+    chown -R www-data:www-data /var/www/html/
 fi
 
 # If $INSTALL is set to false or not set, remove the install and updater directories
