@@ -20,6 +20,11 @@ if [ "false" == $INSTALL ] || [ -z ${INSTALL+x} ]; then
     fi
 fi
 
+# Temporary fix until https://github.com/sbpp/sourcebans-pp/issues/972 is resolved
+if [ ! -d /var/www/html/cache ]; then
+    mkdir /var/www/html/cache
+fi
+
 if [ "true" == $SET_OWNER ] && [ "$(id -u)" -eq 0 ]; then
     chown -R $SET_OWNER_UID:$SET_OWNER_GID /var/www/html
 fi
