@@ -3,13 +3,15 @@ services:
   web:
     image: crinis/sourcebans:latest
     environment:
-      # Enable on install or update and make sure to set this to 'false' afterwards
-      # Also set this to false if you made any manual changes to Sourcebans sourcecode you want to keep
+      # Enable on install or update and make sure to set this to 'false' afterwards.
+      # Also set this to false if you made any manual changes to Sourcebans sourcecode you want to keep.
       INSTALL: 'true'
+      # Set this to 'true' if you are starting the container as root and want to change the owner of the files to the webserver user.
+      SET_OWNER: 'true'
     networks:
       - db
     ports: 
-    # Change the port before the colon to whatever you want to use
+    # Change the port before the colon to whatever you want to use.
     - 80:8080
     volumes:
       - sourcebans:/var/www/html/

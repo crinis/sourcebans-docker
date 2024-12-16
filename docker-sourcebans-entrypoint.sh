@@ -20,4 +20,8 @@ if [ "false" == $INSTALL ] || [ -z ${INSTALL+x} ]; then
     fi
 fi
 
+if [ "true" == $SET_OWNER ] && [ "$(id -u)" -eq 0 ]; then
+    chown -R $SET_OWNER_UID:$SET_OWNER_GID /var/www/html
+fi
+
 exec "docker-php-entrypoint" $@

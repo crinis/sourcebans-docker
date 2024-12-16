@@ -38,6 +38,7 @@ There are various different types of tags you can use if you automate your deplo
 ### Environment Variables
 
 * `INSTALL` - If set to "true" this copies Sourcebans into the `/var/www/html` directory and may override your manual changes. This should be set on first install and can be enabled for a convenient update. **Always make a full backup before setting this to 'true'!**
+* `SET_OWNER` - If set to "true" the ownership of the `/var/www/html` directory is recursively set to the webserver user and group. This only works as root.
 
 ### Volumes
 
