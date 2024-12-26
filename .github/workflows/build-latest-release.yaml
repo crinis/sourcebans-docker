@@ -14,7 +14,7 @@ jobs:
         name: Set latest release tag
         if: github.event_name != 'release'
         run: |
-          echo "RELEASE_TAG=$(curl https://api.github.com/repos/crinis/sourcebans-docker/releases -s | jq -r ".[].tag_name")" >> $GITHUB_ENV
+          echo "RELEASE_TAG=$(curl https://api.github.com/repos/crinis/sourcebans-docker/releases/latest -s | jq -r ".tag_name")" >> $GITHUB_ENV
       -
         name: Set current release tag
         if: github.event_name == 'release'
