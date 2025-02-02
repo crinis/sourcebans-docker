@@ -43,9 +43,9 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${SB_TAG}-amd64, ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-latest-amd64, ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${{ github.run_id }}-amd64
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${{ env.SB_TAG }}-amd64, ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-latest-amd64, ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${{ github.run_id }}-amd64
           build-args: |
-            CHECKOUT=${SB_TAG}
+            CHECKOUT=${{ env.SB_TAG }}
 
   build-arm64:
     runs-on: ubuntu-24.04-arm
@@ -71,9 +71,9 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${SB_TAG}-arm64, ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-latest-arm64, ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${{ github.run_id }}-arm64
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${{ env.SB_TAG }}-arm64, ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-latest-arm64, ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${{ github.run_id }}-arm64
           build-args: |
-            CHECKOUT=${SB_TAG}
+            CHECKOUT=${{ env.SB_TAG }}
 
   create-manifests:
     runs-on: ubuntu-latest
@@ -96,9 +96,9 @@ jobs:
           SB_TAG: ${{ needs.get-sb-tag.outputs.sb-tag }}
         run: |
           docker buildx imagetools create \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${SB_TAG} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${SB_TAG}-amd64 \
-            ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${SB_TAG}-arm64
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${{ env.SB_TAG }} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${{ env.SB_TAG }}-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${{ env.SB_TAG }}-arm64
 
       - name: Create latest manifest and push
         run: |
