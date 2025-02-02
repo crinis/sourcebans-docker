@@ -10,19 +10,24 @@ env:
   IMAGE_NAME: sourcebans
 
 jobs:
+  get-release-tag:
+    runs-on: ubuntu-24.04
+    outputs:
+      release-tag: ${{ steps.get-release-tag.outputs.release-tag }}
+    steps:
+      - name: Get latest release
+        id: get-release-tag
+        run: |
+            if [ "${{ github.event_name }}" != "release" ]; then
+              echo "release-tag=$(curl https://api.github.com/repos/crinis/sourcebans-docker/releases -s | jq -r ".[].tag_name" | grep '^1\.7\.[0-9]*$' -m1)" >> $GITHUB_OUTPUT
+            else
+              echo "release-tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+            fi
+
   build-amd64:
     runs-on: ubuntu-24.04
+    needs: get-release-tag
     steps:
-      - name: Set latest release tag
-        if: github.event_name != 'release'
-        run: |
-          echo "RELEASE_TAG=$(curl https://api.github.com/repos/crinis/sourcebans-docker/releases/latest -s | jq -r ".tag_name")" >> $GITHUB_ENV
-
-      - name: Set current release tag
-        if: github.event_name == 'release'
-        run: |
-          echo "RELEASE_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -39,25 +44,18 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v6
+        env:
+          RELEASE_TAG: ${{ needs.get-release-tag.outputs.release-tag }}
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.RELEASE_TAG }}-amd64, ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest-amd64, ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}-amd64
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${RELEASE_TAG}-amd64, ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest-amd64, ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}-amd64
 
   build-arm64:
     runs-on: ubuntu-24.04-arm
+    needs: get-release-tag
     steps:
-      - name: Set latest release tag
-        if: github.event_name != 'release'
-        run: |
-          echo "RELEASE_TAG=$(curl https://api.github.com/repos/crinis/sourcebans-docker/releases/latest -s | jq -r ".tag_name")" >> $GITHUB_ENV
-
-      - name: Set current release tag
-        if: github.event_name == 'release'
-        run: |
-          echo "RELEASE_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -74,15 +72,17 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v6
+        env:
+          RELEASE_TAG: ${{ needs.get-release-tag.outputs.release-tag }}
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.RELEASE_TAG }}-arm64, ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest-arm64, ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}-arm64
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${RELEASE_TAG}-arm64, ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest-arm64, ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ github.run_id }}-arm64
 
   create-manifests:
     runs-on: ubuntu-24.04
-    needs: [build-amd64, build-arm64]
+    needs: [get-release-tag, build-amd64, build-arm64]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -97,11 +97,13 @@ jobs:
         uses: docker/setup-qemu-action@v3
 
       - name: Create manifest for tag ${{ env.RELEASE_TAG }} and push
+        env:
+          RELEASE_TAG: ${{ needs.get-release-tag.outputs.release-tag }}
         run: |
           docker buildx imagetools create \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.RELEASE_TAG }} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.RELEASE_TAG }}-amd64 \
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.RELEASE_TAG }}-arm64
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${RELEASE_TAG } \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${RELEASE_TAG}-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${RELEASE_TAG}-arm64
 
       - name: Create latest manifest and push
         run: |
