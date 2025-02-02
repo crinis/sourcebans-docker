@@ -19,7 +19,7 @@ jobs:
         id: get-release-tag
         run: |
             if [ "${{ github.event_name }}" != "release" ]; then
-              echo "release-tag=$(curl https://api.github.com/repos/crinis/sourcebans-docker/releases -s | jq -r ".[].tag_name" | grep '^1\.7\.[0-9]*$' -m1)" >> $GITHUB_OUTPUT
+              echo "release-tag=$(curl https://api.github.com/repos/crinis/sourcebans-docker/releases/latest -s | jq -r ".tag_name")" >> $GITHUB_OUTPUT
             else
               echo "release-tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
             fi
