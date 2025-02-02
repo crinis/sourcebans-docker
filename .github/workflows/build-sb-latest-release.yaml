@@ -110,6 +110,6 @@ jobs:
       - name: Create manifest for run ID and push
         run: |
           docker buildx imagetools create \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:sb-${{ github.run_id }} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:sb-${{ github.run_id }}-amd64 \
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:sb-${{ github.run_id }}-arm64
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${{ github.run_id }} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${{ github.run_id }}-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/sourcebans:sb-${{ github.run_id }}-arm64
