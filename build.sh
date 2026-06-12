@@ -24,4 +24,3 @@ function get_latest_release_tag() {
 SB_TAG=$(get_latest_release_tag)
 
 $TOOL build -t crinis/sourcebans:sb-${SB_TAG} -t crinis/sourcebans:latest --build-arg CHECKOUT="${SB_TAG}" .
-$TOOL build -t crinis/sourcebans:sb-dev --build-arg CHECKOUT="php81" .
