@@ -1,26 +1,31 @@
-#!/usr/bin/zsh
+#!/usr/bin/env bash
 #
 # Builds Sourcebans Docker images locally
 
-set -e
+set -euo pipefail
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <docker|podman>"
+if [ "$#" -ne 1 ] || { [ "$1" != "docker" ] && [ "$1" != "podman" ]; }; then
+    echo "Usage: $0 <docker|podman>" >&2
     exit 1
 fi
 
-TOOL=$1
+TOOL="$1"
 
-if [ "$TOOL" != "docker" ] && [ "$TOOL" != "podman" ]; then
-    echo "Invalid argument: $TOOL. Use 'docker' or 'podman'."
-    exit 1
-fi
-
-function get_latest_release_tag() {
-    SB_TAG=$(curl https://api.github.com/repos/sbpp/sourcebans-pp/releases -s | jq -r ".[].tag_name" | grep '^1\.7\.[0-9]*$' -m1)
-    echo $SB_TAG
+get_latest_release_tag() {
+    curl -fsSL \
+        ${GITHUB_TOKEN:+-H "Authorization: Bearer ${GITHUB_TOKEN}"} \
+        -H "Accept: application/vnd.github+json" \
+        'https://api.github.com/repos/sbpp/sourcebans-pp/releases?per_page=100' \
+      | jq -r '[ .[] | select(.prerelease == false) | .tag_name | select(test("^1\\.8\\.[0-9]+$")) ] | first // empty'
 }
 
-SB_TAG=$(get_latest_release_tag)
+SB_TAG="$(get_latest_release_tag)"
+test -n "$SB_TAG" || { echo "ERROR: could not determine SourceBans release tag" >&2; exit 1; }
 
-$TOOL build -t crinis/sourcebans:sb-${SB_TAG} -t crinis/sourcebans:latest --build-arg CHECKOUT="${SB_TAG}" .
+EXTRA_ARGS=()
+if [ "$TOOL" = "podman" ]; then
+    # The default OCI image format drops the HEALTHCHECK instruction.
+    EXTRA_ARGS+=(--format docker)
+fi
+
+"$TOOL" build "${EXTRA_ARGS[@]}" -t "crinis/sourcebans:sb-${SB_TAG}" -t crinis/sourcebans:latest --build-arg CHECKOUT="${SB_TAG}" .
