@@ -27,14 +27,18 @@ RUN savedAptMark="$(apt-mark showmanual)" && \
 
 RUN mkdir /docker/ && \
     mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini && \
-    sed -i 's/Listen 80/Listen 8080/g' /etc/apache2/ports.conf && \
-    sed -i 's/80/8080/g' /etc/apache2/sites-enabled/000-default.conf
+    sed -i 's/Listen 80$/Listen 8080/' /etc/apache2/ports.conf && \
+    sed -i 's/:80>/:8080>/' /etc/apache2/sites-enabled/000-default.conf && \
+    echo 'ServerName localhost' > /etc/apache2/conf-available/servername.conf && \
+    a2enconf servername
 
 COPY --from=composer /app/sourcebans-pp/web /usr/src/sourcebans
-COPY docker-sourcebans-entrypoint.sh /docker/docker-sourcebans-entrypoint.sh
+COPY --chmod=0755 docker-sourcebans-entrypoint.sh /docker/docker-sourcebans-entrypoint.sh
 COPY sourcebans.ini /usr/local/etc/php/conf.d/sourcebans.ini
 
-RUN chmod +x /docker/docker-sourcebans-entrypoint.sh
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD curl -fsS -o /dev/null http://127.0.0.1:8080/ || exit 1
 
 ENTRYPOINT ["/docker/docker-sourcebans-entrypoint.sh"]
 CMD ["apache2-foreground"]
