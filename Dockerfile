@@ -26,6 +26,10 @@ RUN savedAptMark="$(apt-mark showmanual)" && \
     apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false
 
 RUN mkdir /docker/ && \
+    # Drop the base image's sticky bit: named volumes seeded from this
+    # directory must let a container that is assigned a new UID (arbitrary-UID
+    # platforms run with GID 0) replace entries left by a previous UID.
+    chmod 0777 /var/www/html && \
     mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini && \
     sed -i 's/Listen 80$/Listen 8080/' /etc/apache2/ports.conf && \
     sed -i 's/:80>/:8080>/' /etc/apache2/sites-enabled/000-default.conf && \

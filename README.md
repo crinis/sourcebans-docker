@@ -34,7 +34,7 @@ There are various different types of tags you can use if you automate your deplo
 ### Environment Variables
 
 * `INSTALL` - If set to `true` this force-copies Sourcebans into the `/var/www/html` directory, overwriting the directories `themes/default`, `updater`, `install`, `pages` and `includes` (your `config.php`, demos, uploads and custom themes are kept). Use it for a single start when updating, then set it back to `false`. **Always make a full backup before setting this to `true`!** When the webroot is empty (first start), Sourcebans is installed automatically regardless of this variable.
-* `SET_OWNER` - If set to `true` (default) the ownership of the `/var/www/html` directory is recursively set to the webserver user and group on every start. This only works when the container starts as root.
+* `SET_OWNER` - If set to `true` (default) the image manages the permissions of the `/var/www/html` directory on every start: when the container runs as root, ownership is recursively set to the webserver user and group; when it runs as a non-root user, the directory is made group-writable instead so later starts under a different UID with the same group keep working. Set to `false` to leave permissions untouched.
 * `SET_OWNER_UID` - UID that `/var/www/html` is chowned to when `SET_OWNER` is `true`. Defaults to `33` (`www-data` in the official PHP images).
 * `SET_OWNER_GID` - GID that `/var/www/html` is chowned to when `SET_OWNER` is `true`. Defaults to `33`.
 
@@ -80,7 +80,7 @@ Newer images ship SourceBans++ 1.8.x on PHP 8.3 (previously 1.7.0 on PHP 8.1, wh
 
 ### Rootless
 
-The image can be used fully rootless, e.g. with rootless Podman. The webserver binds port 8080 and never needs root; the entrypoint skips the ownership change when not running as root.
+The image can be used fully rootless, e.g. with rootless Podman. The webserver binds port 8080 and never needs root; when not running as root, the entrypoint makes the webroot group-writable instead of changing its ownership (see `SET_OWNER`).
 
 With Podman, run the container with your own user mapped into the user namespace so the volume stays writable:
 
@@ -94,7 +94,16 @@ services:
       - sourcebans:/var/www/html/:z
 ```
 
-When running as a non-root user on a rootful Docker daemon (`docker run --user`), named volumes work out of the box: the webroot ships world-writable with a sticky bit, like the official PHP images. When bind-mounting a host directory instead, make sure it is writable by the container user.
+When running as a non-root user on a rootful Docker daemon (`docker run --user`), named volumes work out of the box: the webroot ships world-writable. When bind-mounting a host directory instead, make sure it is writable by the container user.
+
+#### Arbitrary UIDs and GIDs (podman userns, OpenShift, Kubernetes)
+
+The image runs with any UID/GID combination, including randomly assigned ones that have no entry in `/etc/passwd` — Apache binds the unprivileged port 8080 and needs no capabilities. On every non-root start the entrypoint makes the webroot group-writable, so the installation keeps working when a later start is assigned a different UID with the same group (e.g. GID `0` on OpenShift).
+
+If both the UID and the GID change between starts, let the runtime re-own the volume:
+
+* **Podman**: add the `U` volume flag (combinable with SELinux labels), e.g. `-v sourcebans:/var/www/html:U,Z` — podman chowns the volume to the container user on every start.
+* **Kubernetes/OpenShift**: set `fsGroup` in the pod's `securityContext` (the OpenShift `restricted` SCC does this automatically). Point readiness/liveness probes at port 8080 — the image's `HEALTHCHECK` is not used there.
 
 ## Authors
 

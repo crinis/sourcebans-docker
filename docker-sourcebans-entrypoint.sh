@@ -27,8 +27,18 @@ fi
 # Temporary fix until https://github.com/sbpp/sourcebans-pp/issues/972 is resolved
 mkdir -p /var/www/html/cache
 
-if [ "$SET_OWNER" = "true" ] && [ "$(id -u)" -eq 0 ]; then
-    chown -R "$SET_OWNER_UID:$SET_OWNER_GID" /var/www/html
+if [ "$SET_OWNER" = "true" ]; then
+    if [ "$(id -u)" -eq 0 ]; then
+        chown -R "$SET_OWNER_UID:$SET_OWNER_GID" /var/www/html
+    else
+        # Non-root runs (podman userns setups, docker --user, OpenShift):
+        # give the container's group the owner's permissions so the webroot
+        # stays writable when a later start is assigned a different UID with
+        # the same group (e.g. GID 0 on OpenShift). Best effort: files owned
+        # by a previous UID cannot be re-chmodded; use podman's :U volume
+        # flag to re-own the volume when both UID and GID change.
+        chmod -R g=u /var/www/html 2>/dev/null || true
+    fi
 fi
 
 exec docker-php-entrypoint "$@"
