@@ -19,8 +19,11 @@ elif [ ! -e /var/www/html/index.php ]; then
     # First start against an empty docroot: install automatically.
     echo >&2 "No SourceBans++ installation found in /var/www/html: copying sources ..."
     cp -R /usr/src/sourcebans/. /var/www/html/
-else
+elif [ -s /var/www/html/config.php ]; then
     # Normal start: make sure the web installer and updater are not exposed.
+    # The installer writes a non-empty config.php on its final step; until
+    # then keep it around so a restart cannot break an unfinished setup
+    # (visiting /install creates config.php as an empty file, hence -s).
     rm -rf /var/www/html/install /var/www/html/updater
 fi
 

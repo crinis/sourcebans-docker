@@ -19,7 +19,7 @@ If you use [Docker Compose](https://docs.docker.com/compose/) there is an exampl
    ```
 2. Run `docker compose up -d`. SourceBans++ is copied into the volume automatically on first start.
 3. Visit `http://localhost/install` (the host port mapped to container port 8080, port 80 in the example) and complete the web installer. Use `db` as the database host and the credentials from your `.env` file.
-4. Run `docker compose restart web`. The restart removes the `install` and `updater` directories from the webroot.
+4. Run `docker compose restart web`. The restart removes the `install` and `updater` directories from the webroot. This only happens once the installer has written your `config.php`, so restarting earlier cannot break an unfinished setup.
 
 ### Image Tags
 
