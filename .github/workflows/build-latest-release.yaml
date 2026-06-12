@@ -40,7 +40,7 @@ jobs:
     needs: get-release-tag
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ needs.get-release-tag.outputs.release-tag }}
 
@@ -68,7 +68,7 @@ jobs:
     needs: get-release-tag
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ needs.get-release-tag.outputs.release-tag }}
 
