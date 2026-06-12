@@ -8,6 +8,9 @@ on:
     branches:
       - "master"
 
+permissions:
+  contents: read
+
 jobs:
   get-sb-tag:
     runs-on: ubuntu-24.04
@@ -16,15 +19,23 @@ jobs:
     steps:
       - name: Get latest Sourcebans release
         id: get-sb-tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "sb-tag=$(curl https://api.github.com/repos/sbpp/sourcebans-pp/releases -s | jq -r ".[].tag_name" | grep '^1\.7\.[0-9]*$' -m1)" >> $GITHUB_OUTPUT
-  
+          SB_TAG="$(curl -fsSL \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              'https://api.github.com/repos/sbpp/sourcebans-pp/releases?per_page=100' \
+            | jq -r '[ .[] | select(.prerelease == false) | .tag_name | select(test("^1\\.8\\.[0-9]+$")) ] | first // empty')"
+          test -n "$SB_TAG" || { echo "ERROR: could not determine SourceBans release tag" >&2; exit 1; }
+          echo "sb-tag=${SB_TAG}" >> $GITHUB_OUTPUT
+
   build-amd64:
     runs-on: ubuntu-24.04
     needs: get-sb-tag
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -52,7 +63,7 @@ jobs:
     needs: get-sb-tag
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -76,20 +87,14 @@ jobs:
             CHECKOUT=${{ env.SB_TAG }}
 
   create-manifests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [get-sb-tag, build-amd64, build-arm64]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       - name: Create manifest for sb-{tag} and push
         env:

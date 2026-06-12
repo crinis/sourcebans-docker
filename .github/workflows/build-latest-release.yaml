@@ -6,6 +6,9 @@ on:
   release:
     types: [created]
 
+permissions:
+  contents: read
+
 env:
   IMAGE_NAME: sourcebans
 
@@ -17,23 +20,29 @@ jobs:
     steps:
       - name: Get latest release
         id: get-release-tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-            if [ "${{ github.event_name }}" != "release" ]; then
-              echo "release-tag=$(curl https://api.github.com/repos/crinis/sourcebans-docker/releases/latest -s | jq -r ".tag_name")" >> $GITHUB_OUTPUT
-            else
-              echo "release-tag=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
-            fi
+          if [ "${{ github.event_name }}" != "release" ]; then
+            RELEASE_TAG="$(curl -fsSL \
+                -H "Accept: application/vnd.github+json" \
+                -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+                'https://api.github.com/repos/${{ github.repository }}/releases/latest' \
+              | jq -r '.tag_name // empty')"
+          else
+            RELEASE_TAG="${{ github.event.release.tag_name }}"
+          fi
+          test -n "$RELEASE_TAG" || { echo "ERROR: could not determine release tag" >&2; exit 1; }
+          echo "release-tag=${RELEASE_TAG}" >> $GITHUB_OUTPUT
 
   build-amd64:
     runs-on: ubuntu-24.04
     needs: get-release-tag
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-        env:
-          RELEASE_TAG: ${{ needs.get-release-tag.outputs.release-tag }}
+        uses: actions/checkout@v4
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: ${{ needs.get-release-tag.outputs.release-tag }}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -59,11 +68,9 @@ jobs:
     needs: get-release-tag
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-        env:
-          RELEASE_TAG: ${{ needs.get-release-tag.outputs.release-tag }}
+        uses: actions/checkout@v4
         with:
-          ref: ${{ env.RELEASE_TAG }}
+          ref: ${{ needs.get-release-tag.outputs.release-tag }}
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -88,17 +95,11 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [get-release-tag, build-amd64, build-arm64]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       - name: Create manifest for release tag and push
         env:
