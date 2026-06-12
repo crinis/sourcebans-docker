@@ -6,7 +6,7 @@ RUN git clone https://github.com/sbpp/sourcebans-pp.git && \
     composer install --no-dev --no-interaction --no-progress --optimize-autoloader --ignore-platform-reqs --working-dir=sourcebans-pp/web/
 
 # Build the actual image
-FROM docker.io/library/php:8.3-apache
+FROM docker.io/library/php:8.5-apache
 
 ENV INSTALL=false \
     SET_OWNER_UID=33 \
