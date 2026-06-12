@@ -1,33 +1,43 @@
-version: '3'
 services:
   web:
-    image: crinis/sourcebans:latest
+    image: docker.io/crinis/sourcebans:latest
     environment:
       # SourceBans++ is installed automatically on first start.
       # Set INSTALL to 'true' for a single start to force-update the sources
       # (overwrites themes/default, updater, install, pages and includes),
       # then set it back to 'false'. Always create a backup first.
       INSTALL: 'false'
-      # Set this to 'true' if you are starting the container as root and want to change the owner of the files to the webserver user.
+      # When the container starts as root, ownership of /var/www/html is given
+      # to the webserver user on every start. Disable with 'false'.
       SET_OWNER: 'true'
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - db
     ports:
-    # Change the port before the colon to whatever you want to use.
-    - 80:8080
+      # Change the port before the colon to whatever you want to use.
+      # The container listens on port 8080 internally.
+      - "80:8080"
     volumes:
       - sourcebans:/var/www/html/
-    # You can enable the following three lines to run the container as a different user. For example when using podman.
-    #  - sourcebans:/var/www/html/:z
-    # user: ${DOCKER_UID:-1000}:${DOCKER_GID:-1000}
-    # userns_mode: "keep-id"
+
   db:
-    image: mariadb:10
+    image: docker.io/library/mariadb:11
     environment:
-      MYSQL_USER: sourcebans
-      MYSQL_PASSWORD: ThisShouldBeAStrongPassword
-      MYSQL_DATABASE: sourcebans
-      MYSQL_ROOT_PASSWORD: ThisShouldBeAStrongPassword
+      MARIADB_USER: sourcebans
+      # Define the passwords in an .env file next to this compose file:
+      #   DB_PASSWORD=...
+      #   DB_ROOT_PASSWORD=...
+      MARIADB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      MARIADB_DATABASE: sourcebans
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?set DB_ROOT_PASSWORD in .env}
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
       - mysql:/var/lib/mysql
     networks:
