@@ -4,29 +4,31 @@
 
 set -euo pipefail
 
-# Copy Sourcebans sourcecode to docroot
-if [ "true" == $INSTALL ]; then
-    rm -rf /var/www/html/themes/default /var/www/html/updater /var/www/html/install /var/www/html/pages /var/www/html/includes
-    cp -R /usr/src/sourcebans/* /var/www/html/
-fi
+: "${INSTALL:=false}"
+: "${SET_OWNER:=true}"
+: "${SET_OWNER_UID:=33}"
+: "${SET_OWNER_GID:=33}"
 
-# If $INSTALL is set to false or not set, remove the install and updater directories
-if [ "false" == $INSTALL ] || [ -z ${INSTALL+x} ]; then
-    if [ -d /var/www/html/install/ ]; then
-        rm -R /var/www/html/install/
-    fi
-    if [ -d /var/www/html/updater/ ]; then
-        rm -R /var/www/html/updater/
-    fi
+if [ "$INSTALL" = "true" ]; then
+    # Forced install/update: replace all upstream-managed directories.
+    echo >&2 "INSTALL=true: updating SourceBans++ sources in /var/www/html ..."
+    rm -rf /var/www/html/themes/default /var/www/html/updater \
+        /var/www/html/install /var/www/html/pages /var/www/html/includes
+    cp -R /usr/src/sourcebans/. /var/www/html/
+elif [ ! -e /var/www/html/index.php ]; then
+    # First start against an empty docroot: install automatically.
+    echo >&2 "No SourceBans++ installation found in /var/www/html: copying sources ..."
+    cp -R /usr/src/sourcebans/. /var/www/html/
+else
+    # Normal start: make sure the web installer and updater are not exposed.
+    rm -rf /var/www/html/install /var/www/html/updater
 fi
 
 # Temporary fix until https://github.com/sbpp/sourcebans-pp/issues/972 is resolved
-if [ ! -d /var/www/html/cache ]; then
-    mkdir /var/www/html/cache
+mkdir -p /var/www/html/cache
+
+if [ "$SET_OWNER" = "true" ] && [ "$(id -u)" -eq 0 ]; then
+    chown -R "$SET_OWNER_UID:$SET_OWNER_GID" /var/www/html
 fi
 
-if [ "true" == $SET_OWNER ] && [ "$(id -u)" -eq 0 ]; then
-    chown -R $SET_OWNER_UID:$SET_OWNER_GID /var/www/html
-fi
-
-exec "docker-php-entrypoint" $@
+exec docker-php-entrypoint "$@"
