@@ -47,7 +47,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         env:
           SB_TAG: ${{ needs.get-sb-tag.outputs.sb-tag }}
         with:
@@ -75,7 +75,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         env:
           SB_TAG: ${{ needs.get-sb-tag.outputs.sb-tag }}
         with:

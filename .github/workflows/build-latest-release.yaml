@@ -54,7 +54,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         env:
           RELEASE_TAG: ${{ needs.get-release-tag.outputs.release-tag }}
         with:
@@ -82,7 +82,7 @@ jobs:
         uses: docker/setup-buildx-action@v4
 
       - name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         env:
           RELEASE_TAG: ${{ needs.get-release-tag.outputs.release-tag }}
         with:
