@@ -1,4 +1,4 @@
-FROM docker.io/library/composer:2.8 AS composer
+FROM docker.io/library/composer:2.10 AS composer
 ARG CHECKOUT=1.8.4
 
 RUN git clone https://github.com/sbpp/sourcebans-pp.git && \
